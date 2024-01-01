@@ -14,13 +14,13 @@ function parseProxyParameters(proxyRequest){
 }
 
 function filterHeaders(req) {
-  const allowedHeadersList = process.env.ALLOWED_HEADERS ? process.env.ALLOWED_HEADERS.split(',') : [];
+  const allowedHeadersList = process.env.ALLOWED_HEADERS ?
+                             process.env.ALLOWED_HEADERS.toLowerCase().split(',') : [];
   const filteredHeaders = {};
 
-  allowedHeadersList.forEach(header => {
-    const headerValue = req.headers[header.toLowerCase()];
-    if (headerValue) {
-      filteredHeaders[header.toLowerCase()] = headerValue;
+  Object.keys(req.headers).forEach(header => {
+    if (allowedHeadersList.includes(header.toLowerCase())) {
+      filteredHeaders[header] = req.headers[header];
     }
   });
 
