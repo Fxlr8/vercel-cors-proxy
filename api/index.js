@@ -27,7 +27,10 @@ app.all('/*', async (req, res) => {
     }
     
     // proxy request to target url
-    const target = request(proxyParams.url)
+    const target = request({
+      url: proxyParams.url,
+      headers: req.headers
+    })
     req.pipe(target)
     target.pipe(res)
     
