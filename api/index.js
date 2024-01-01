@@ -13,6 +13,20 @@ function parseProxyParameters(proxyRequest){
   return params
 }
 
+function filterHeaders(req) {
+  const allowedHeadersList = process.env.ALLOWED_HEADERS ? process.env.ALLOWED_HEADERS.split(',') : [];
+  const filteredHeaders = {};
+
+  allowedHeadersList.forEach(header => {
+    const headerValue = req.headers[header.toLowerCase()];
+    if (headerValue) {
+      filteredHeaders[header.toLowerCase()] = headerValue;
+    }
+  });
+
+  return filteredHeaders;
+}
+
 const app = express();
 app.use(cors());
 app.set('json spaces', 2)
@@ -25,11 +39,14 @@ app.all('/*', async (req, res) => {
         "detail": "The parameter: url was not provided",
       }) 
     }
+
+    // pass only allowed headers
+    const targetHeaders = filterHeaders(req)
     
     // proxy request to target url
     const target = request({
       url: proxyParams.url,
-      headers: req.headers
+      headers: targetHeaders
     })
     req.pipe(target)
     target.pipe(res)
